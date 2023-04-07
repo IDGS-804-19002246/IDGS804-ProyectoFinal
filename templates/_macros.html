@@ -1,0 +1,14 @@
+{% macro render_firld2(field) %}
+        <div class="controls">
+            {{field.label}}
+            <br>
+            {{field(**kwargs)|safe}}
+        </div>
+    {% if field.errors %}
+        <ul class="bg-danger">
+            {% for error in field.errors %}
+                <li style="color:white;" class="text-break">{{error}}</li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+{% endmacro %}

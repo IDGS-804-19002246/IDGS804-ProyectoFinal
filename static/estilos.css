@@ -1,0 +1,192 @@
+html, body{
+    height:calc(100% - 2px);
+    /* font-family: sans-serif; */
+    background-color: black;
+}
+.nav-item{
+    padding: 0 32px;
+}
+.nav-item:hover{
+    background-color: #aa0313;
+    transition-duration: 0.5s;
+}
+
+.bg-opacity{background-color: var(--co);}
+.btn-esquina{
+    position: absolute;
+    top: 8px;
+    right: 8px;
+}
+
+
+/* ------------------------------------------------------------ */
+.fondo{
+    height:100%;
+    width: 100%;
+    background-size: 100% 100%;
+    background-image: var(--f);
+}
+
+.targeta{
+    width: 24%;
+    position: relative;
+}
+.targeta:hover{
+    background-color: rgba(0, 0, 0, 0.8);
+    transition-duration: 0.5s;
+}
+
+.targeta .esconder{
+    position: absolute;
+    top: 8px;
+    left: 0px;
+    padding: 8px 8px;
+    color: white;
+
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+
+    opacity: 0;
+    width: 0%;
+    transition: 0.5s all ease;
+}
+.esconder2{
+    position: absolute;
+    top: 8px;
+    left: 0px;
+    padding: 8px 8px;
+    color: white;
+
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+
+    opacity: 0;
+    width: 0%;
+    transition: 0.5s all ease;
+}
+.targeta:hover .esconder, .targeta:active .esconder{
+    opacity: 1;
+    width: 80%;
+
+    transition-duration: 0.5s;
+    transition: 0.5s all ease;
+}
+.targeta:hover .Centrado, .targeta:active .Centrado{
+    background-color: white;
+    color: #aa0313;
+    border-color: #aa0313;
+}
+
+.producto .col-sm-6{
+    height: 100%;
+}
+
+
+
+
+.Centrado{
+    width: 60%;
+    margin-left: 20%;
+    background-color: #aa0313;
+    color: white;
+
+}
+.cuadrado{
+    width: 100%;
+    height: 0;
+    padding-bottom: 100%;
+    position: relative;
+    overflow: hidden;
+}
+.cuadrado img {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+
+.logo{
+    width:30%;
+    margin-left: 35%;
+    padding-top: 2%;
+}
+.bloque{
+    display: inline-block;
+}
+@media (max-width: 1200px) {
+    .logo{
+        width:80%;
+        margin-left: 10%;
+        margin-top: 10%;
+    }
+    .producto .col-sm-6{
+        height: 50%;
+    }
+    .bloque{
+        display: block;
+    }
+}
+
+
+
+
+
+
+
+
+.portada h4{
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+}
+
+
+/* ------------------------------------------------------------ */
+
+#insumos table tr th,#insumos table tr td{
+    width: 8%;
+    border-bottom: 2px solid #aa0313;
+}
+#insumos table tr th:first-child, #insumos table tr td:first-child{
+    width: 4%;
+}
+#insumos table tbody{
+    /* overflow-y:auto; */
+    overflow-x: hidden; 
+    height: 360px;
+    /* scrollbar-color:  transparent transparent; */ 
+    scrollbar-width:none;
+}
+
+#carrito tr th,#carrito tr td{
+    width: 4%;
+    border-bottom: 2px solid #aa0313;
+}
+#carrito table tbody{
+    /* overflow-y:auto; */
+    overflow-x: hidden; 
+    height: 360px;
+    /* scrollbar-color:  transparent transparent; */ 
+    scrollbar-width:none;
+}
+.borde{
+    border-bottom: 2px solid #aa0313;
+}
+.borde-r{
+    border-right: 2px solid #fff;
+}
+
+
+.table-responsive{max-height: 360px;}
+.table thead{
+position: sticky;
+top: 0;
+z-index: 1;
+}
+.table th{padding: 4px 16px;}
+  
+  
+  

@@ -1,0 +1,138 @@
+{% extends "layout.html" %}
+
+{% block content %}
+{% from '_macros.html' import render_firld2 %}
+<div class="bg-light p-1"></div>
+<div class="p-4 pt-2 h-100 fondo" style="--f:url(../static/img/fondo1.jpg)">
+
+    <div class="row bg-light rounded pb-2 fw-bold">
+        <form action="/insumos" method="POST" id="form">
+            <h4 class="text-center fw-bold" id="titulo">Añadir Ingrediente</h4>
+            <input type="hidden" name="csrf_token" value="{{csrf_token()}}" />
+            <input type="hidden" name="accion" value="add" />
+            <input type="hidden" name="id_insumo" value="" />
+
+            <div class="px-2 py-1"><Label>El ingrediente es no perecedero</Label>
+                <input type="checkbox" name="perecedero" onchange="EsPerecedero(this)">
+            </div>
+
+            <div class="d-inline-block px-2 py-1">{{render_firld2(form.nombre)}}</div>
+            <div class="d-inline-block px-2 py-1">{{render_firld2(form.cantidad)}}</div>
+            <div class="d-inline-block px-2 py-1">{{render_firld2(form.cantidad_min)}}</div>
+            <div class="d-inline-block px-2 py-1">
+                <div class="controls">
+                    <label for="">Medida</label>
+                    <br>
+                    <select name="medida" class="form-select">
+                        <option value="g" selected>Gramos</option>
+                        <option value="ml">Mililitros</option>
+
+                        <option value="Cup">Tazas (240 ml)</option>
+                        <option value="oz">Onzas (28 ml)</option>
+
+                        <option value="pza">Piezas</option>
+                    </select>
+                </div>
+            </div>
+            <div class="d-inline-block px-2 py-1" id="caducidad2">{{render_firld2(form.caducidad)}}</div>
+
+
+            <div class="float-end">
+                <button type="submit" form="form" class="btn btn-danger" formnovalidate>Guardar</button>
+                <button type="button" class="btn btn-warning" onclick="cancel()">Limpiar</button>
+            </div>
+
+        </form>
+    </div>
+
+    <div class="row pt-4" id="insumos">
+        <table class="scroll text-center h-100 w-100 fw-bold">
+            <thead class="d-block w-100 bg-danger text-light">
+                <tr >
+                    <th>N°</th>
+                    <th>Nombre</th>
+                    <th>Cantidad</th>
+                    <th>Cantidad Minima</th>
+                    <th>Caducidad</th>
+
+                    <th>Modificar</th>
+                    <th>Eliminar</th>
+                </tr>
+            </thead>
+
+            <tbody class="d-block w-100 bg-opacity" style="--co:#ffffff80;">
+                {% for i in I %}
+                <tr>
+                    <td>{{loop.index}}/{{I|length}}</td>
+                    <td>{{i.nombre}}</td>
+                    <td>{{i.cantidad}} {{i.medida}}</td>
+                    <td>{{i.cantidad_min}} {{i.medida}}</td>
+
+                    {% if i.caducidad == "1111-11-11" %}
+                        <td>No perecedero</td>
+                    {% else %}
+                        <td>{{i.caducidad}}</td>
+                    {% endif %}
+                    
+
+                    <td>
+                        <button class="rounded-pill btn-danger px-3" onclick="update('{{i.id_insumo}}','{{i.nombre}}','{{i.cantidad}}','{{i.cantidad_min}}','{{i.medida}}','{{i.caducidad}}')">Modificar <i class="bi bi-pencil-square"></i></button>
+                    </td>
+                    <td><a href="insumoDelete?id={{i.id_insumo}}"><button class="rounded-pill btn-warning px-3">Eliminar <i class="bi bi-trash3-fill"></i></button></a></td>
+                </tr>
+                {%endfor%}
+            </tbody>
+
+        </table>
+    </div>
+
+</div>
+<script>
+    window.addEventListener('load',()=>{
+        $('input[name="perecedero"]')[0].checked = false;
+        $('#caducidad').prop('required',true);
+        $('#caducidad').attr('min',new Date().toISOString().split('T')[0]);
+    })
+    function cancel() {
+        $('#form')[0].reset();
+
+        $('#caducidad2').removeClass('d-none');
+        $('#titulo').text('Añadir Ingrediente'); 
+
+        $('input[name="accion"]')[0].value = 'add';
+        $('input[name="id_insumo"]')[0].value = '';
+    }
+    function EsPerecedero(p){
+        if (p.checked == true) {
+            $('#caducidad2').addClass('d-none');
+            $('#caducidad').removeAttr("required");
+        }else{
+            $('#caducidad2').removeClass('d-none');
+            $('#caducidad').prop('required',true);
+        }}
+
+    function update(id_insumo,nombre,cantidad,cantidad_min,medida,caducidad) {
+        $('#titulo').text('Editar Ingrediente');
+        $('input[name="accion"]')[0].value = 'update';
+        
+        $('input[name="id_insumo"]')[0].value = id_insumo;
+        $('input[name="nombre"]')[0].value = nombre;
+        $('input[name="cantidad"]')[0].value = cantidad;
+        $('input[name="cantidad_min"]')[0].value = cantidad_min;
+        
+        console.log(medida+ ' - ' + caducidad);
+
+        $('select[name="medida"]')[0].value = medida;
+
+        if (caducidad == '1111-11-11') {
+            $('input[name="perecedero"]')[0].checked = true;
+            $('#caducidad2').addClass('d-none');
+            $('input[name="caducidad"]')[0].value = '';
+        }else{
+            $('input[name="perecedero"]')[0].checked = false;
+            $('#caducidad2').removeClass('d-none');
+            $('input[name="caducidad"]')[0].value = caducidad;
+        }
+    }
+</script>
+{% endblock content %}
