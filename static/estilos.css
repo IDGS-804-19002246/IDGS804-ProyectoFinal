@@ -78,6 +78,11 @@ html, body{
     color: #aa0313;
     border-color: #aa0313;
 }
+.targeta h4{
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+}
 
 .producto .col-sm-6{
     height: 100%;
@@ -91,7 +96,6 @@ html, body{
     margin-left: 20%;
     background-color: #aa0313;
     color: white;
-
 }
 .cuadrado{
     width: 100%;
@@ -116,6 +120,9 @@ html, body{
 .bloque{
     display: inline-block;
 }
+#usuarios .justify-content-between{
+    display: flex;
+}
 @media (max-width: 1200px) {
     .logo{
         width:80%;
@@ -128,6 +135,16 @@ html, body{
     .bloque{
         display: block;
     }
+    .targeta{
+        width: 49%;
+    }
+    .Centrado{
+        width: 80%;
+        margin-left: 10%;
+    }
+    #usuarios .justify-content-between{
+        display: block;
+    }
 }
 
 
@@ -137,11 +154,7 @@ html, body{
 
 
 
-.portada h4{
-    white-space: nowrap;
-    text-overflow: ellipsis;
-    overflow: hidden;
-}
+
 
 
 /* ------------------------------------------------------------ */
