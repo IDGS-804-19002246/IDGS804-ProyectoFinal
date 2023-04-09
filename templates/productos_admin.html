@@ -11,6 +11,25 @@
 
         <div class="col-sm-3 p-4 mt-2 bg-danger h-25" style="border-radius: 32px 8px 32px 32px;">
             <a href="productos_añadir"><button type="button" class="btn btn-light w-20">Añadir Producto</button></a>
+            
+            {% if M|length != 0 and F|length == 0 %}
+                <ul class="text-light mt-4">
+                {% for m in M %}
+                <li>{{m}}</li>
+                {% endfor %}
+                </ul>
+            {% endif %}
+
+            {% if M|length == 0 and F|length != 0 %}
+                <form action="productos_admin" method="POST" id="cocinarProducto">
+                    <span class="text-light">El producto que solicita cocinar generara mermas en los insumos, desea confirmar esta solicitud</span>
+                    <input type="hidden" name="csrf_token" value="{{csrf_token()}}" />
+                    <input type="hidden" name="accion" value="cocinar">
+                    <input type="hidden" name="id_pro" value="{{F[0]}}">
+                    <input type="hidden" name="unidad" class="w-25" min="1" value="{{F[1]}}">
+                    <button class="btn btn-light" type="submit" form="cocinarProducto">Confirmar Solicitud</button>
+                </form>
+            {% endif %}
         </div>
 
         <div class="col-sm-9 px-0 mt-2 bg-light h-100">
@@ -45,9 +64,11 @@
                                     <a href="productos_editar?id={{g.id_producto}}"><button class="btn btn-light">Producto</button></a>
                                     <a href="productos_reseta?id={{g.id_producto}}"><button class="btn btn-light" onclick="resetaUpdate('{{g.id_producto}}')">Reseta</button></a>
 
-                                    <form action="cocinar" id="cocinar_{{g.id_producto}}" class="d-inline-block">
+                                    <form action="productos_admin" id="cocinar_{{g.id_producto}}" class="d-inline-block" method="POST">
+                                        <input type="hidden" name="csrf_token" value="{{csrf_token()}}" />
                                         <input type="hidden" name="id_pro" value="{{g.id_producto}}">
-                                        <button class="btn btn-light" type="submit" form="cocinar" disabled="false">Preparar Más</button>
+                                        <input type="hidden" name="accion" value="validar">
+                                        <button class="btn btn-light" type="submit" form="cocinar_{{g.id_producto}}" disabled="false">Preparar Más</button>
                                         <input type="number" name="unidad" class="w-25" min="1" oninput="cocinar(this)">
                                     </form>
                                     

@@ -48,8 +48,10 @@
                     <input type="hidden" name="csrf_token" value="{{csrf_token()}}" />
                     <input type="hidden" name="id_producto" value="{{form.id_producto.data}}" />
                     <button type="submit" class="btn btn-light w-20" form="producto">Guardar</button>
-                    <button type="button" class="btn btn-light w-20" onclick="resetear('producto')">Borrar Imagen</button>
-                    <a href="productos_admin"><button type="button" class="btn btn-light w-20">Atras</button></a>
+                    <button type="button" class="btn btn-light w-20" onclick="resetear('producto')">Borrar Imagen (Actualizar)</button>
+                    
+                    <a href="productos_admin"><button type="button" class="btn btn-light m-1">Volver al Administrador sin guardar</button></a>
+                    <a href="productos"><button type="button" class="btn btn-light m-1">Volver al Catalogo sin guardar</button></a>
 
                 </div>
             </div>

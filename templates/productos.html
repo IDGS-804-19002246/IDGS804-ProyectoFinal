@@ -3,7 +3,7 @@
 {% block content %}
 <div class="bg-light p-1"></div>
 <div class="p-4 pt-2 h-100 fondo" style="--f:url(../static/img/fondo1.jpg)">
-    <h1 class="text-light text-center">Todos los productos <a href="productos_admin"><button class="btn btn-danger">Administrar Productos</button></a></h1>
+    <h1 class="text-light text-center">Todos los productos</h1>
     
     
 
@@ -22,11 +22,13 @@
 
                 <button class="Centrado rounded-pill py-1">Ver más</button>
 
+                {% if current_user.is_authenticated and current_user.rol == 'admin' or 'empleado' %}
                 <div class="rounded-end bg-danger esconder">
                     <h6 class="text-light">Administrar</h6>
                     <a href="productos_reseta?id={{g.id_producto}}"><button class="btn btn-light">Reseta</button></a>
                     <a href="productos_editar?id={{g.id_producto}}"><button class="btn btn-light">Producto</button></a>
                 </div>
+                {%endif%}
             </a>
         </div>
         {% endif %}
