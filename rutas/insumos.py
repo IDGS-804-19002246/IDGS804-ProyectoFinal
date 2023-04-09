@@ -15,6 +15,9 @@ ins = Blueprint('ins',__name__)
 
 @ins.route("/insumos", methods=['GET','POST'])
 def insumos():
+    if current_user.rol == 'baneado':
+        flash('Este usuario esta baneado')
+        return redirect(url_for('usu.login'))
     create_form = validaciones.insumos(request.form)
     if request.method == 'POST' and create_form.validate():
         if request.form.get('accion') == 'add':
@@ -42,7 +45,7 @@ def insumos():
     ins = Insumos.InsumosSelectTodos()
     insumos = []
     for i in ins:insumos.append({'id_insumo':i[0],'nombre':i[1].capitalize(),'cantidad':i[2],'cantidad_min':i[3],'medida':i[4],'caducidad':str(i[5])})
-    return render_template('insumos.html', I=insumos, form=create_form)
+    return render_template('insumos.html', I=insumos, form=create_form,current_user=current_user)
 
 
 

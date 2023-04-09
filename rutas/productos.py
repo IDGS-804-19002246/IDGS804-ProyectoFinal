@@ -9,11 +9,13 @@ import os
 
 from db import get_connection
 import validaciones
+from config import db
 import sys
 sys.path.append("..")
 from modelos.productosM import Productos
 from modelos.ventasM import Ventas
 from modelos.insumosM import Insumos
+
 
 pro = Blueprint('pro',__name__)
 
@@ -37,7 +39,7 @@ def productos():
             }
         )
     
-    return render_template('productos.html', G=galletas)
+    return render_template('productos.html', G=galletas,current_user=current_user)
 
 @pro.route("/detalles", methods=['GET','POST'])
 def detalles():
@@ -93,10 +95,11 @@ def detalles():
         response.set_cookie('carrito',data)
         return response
     
-    return render_template('detalles.html', G=galletas,R=reseta)
+    return render_template('detalles.html', G=galletas,R=reseta,current_user=current_user)
 
 
 @pro.route("/carrito_edit", methods=['GET','POST'])
+@login_required
 def carrito_edit():
     carrito = json.loads(request.cookies.get("carrito"))
     response = make_response(redirect(url_for('pro.carrito')))
@@ -124,6 +127,7 @@ def carrito_edit():
 
 
 @pro.route("/carrito", methods=['GET','POST'])
+@login_required
 def carrito():
     carrito = request.cookies.get("carrito")
     lista = []
@@ -169,13 +173,22 @@ def carrito():
         flash('Al compre se realizo con exito.')
         return response
     
-    return render_template('carrito.html', C = lista)
+    if current_user.rol == 'baneado':
+        flash('Esta usuario esta baneado')
+        return redirect(url_for('usu.login'))
+    return render_template('carrito.html', C = lista,current_user=current_user)
 
 
 @pro.route("/productos_admin", methods=['GET','POST'])
+@login_required
 def productos_admin():
+    if current_user.rol == 'baneado':
+        flash('Este usuario esta baneado')
+        return redirect(url_for('usu.login'))
     ga = Productos.ProductosSelectTodos()
     galletas = []
+    msg = []
+    form = []
     for g in ga:
         galletas.append(            
             {
@@ -191,11 +204,31 @@ def productos_admin():
             'estado':g[9]
             }
         )
-    
-    return render_template('productos_admin.html', G=galletas)
+    if request.method == 'POST':
+        if request.form.get('accion') == 'validar':
+            valido = Insumos.InsumosCocinarValidar( int(request.form.get('id_pro')), int(request.form.get('unidad'))) 
+            if len(valido) == 0:
+                msg.append('El producto no tiene Reseta, añada una desde las opciones del producto')
+            else:
+                for v in valido:
+                    if v[1] == 'no': msg.append('Faltan '+ str(v[2])+ ' '+ str(v[3])+ ' de '+ str(v[0]))
+            if len(msg) == 0:
+                form.append(request.form.get('id_pro'))
+                form.append(request.form.get('unidad'))
+        if request.form.get('accion') == 'cocinar':
+            P = db.session.query(Productos).filter(Productos.id_producto == request.form.get('id_pro')).first()
+            P.pendientes = request.form.get('unidad')
+            db.session.add(P)
+            db.session.commit()
+            return redirect(url_for('pro.productos_admin'))
+    return render_template('productos_admin.html', G=galletas, M = msg, F = form,current_user=current_user)
 
 @pro.route("/productos_editar", methods=['GET','POST'])
+@login_required
 def productos_editar():
+    if current_user.rol == 'baneado':
+        flash('Este usuario esta baneado')
+        return redirect(url_for('usu.login'))
     create_form = validaciones.productos(request.form)
     ga = Productos.ProductosSelectUno(request.args.get('id'))
     if request.method == 'GET':
@@ -235,10 +268,14 @@ def productos_editar():
         )
 
         return redirect(url_for('pro.productos_admin'))
-    return render_template('productos_editar.html', form = create_form)
+    return render_template('productos_editar.html', form = create_form,current_user=current_user)
 
 @pro.route("/productos_añadir", methods=['GET','POST'])
+@login_required
 def productos_añadir():
+    if current_user.rol == 'baneado':
+        flash('Este usuario esta baneado')
+        return redirect(url_for('usu.login'))
     create_form = validaciones.productos(request.form)
     ga = Productos.ProductosSelectUno(request.args.get('id'))
     
@@ -267,17 +304,20 @@ def productos_añadir():
 
         )
         return redirect(url_for('pro.productos_admin'))
-    return render_template('productos_añadir.html', form = create_form)
-
+    return render_template('productos_añadir.html', form = create_form,current_user=current_user)
 
 @pro.route("/ProductosDelete", methods=['GET','POST'])
+@login_required
 def ProductosDelete():
     Productos.ProductosDelete(request.args.get('id'))
     return redirect(url_for('pro.productos_admin'))
 
-
 @pro.route("/productos_reseta", methods=['GET','POST'])
+@login_required
 def productos_reseta():
+    if current_user.rol == 'baneado':
+        flash('Este usuario esta baneado')
+        return redirect(url_for('usu.login'))
     reseta = Productos.ProductosSelectReseta(request.args.get('id'))
     producto = Productos.ProductosSelectUno(request.args.get('id'))
     insumos = Insumos.InsumosSelectTodos()
@@ -287,12 +327,15 @@ def productos_reseta():
         for r in reseta:inputs.append({"insumo":r[0],"cantidad":r[1],"medida":r[2],"id":r[3]})
     
     if request.method == 'POST':
-        
         pro = request.form.get('producto')
+        R = db.session.query(Productos).filter(Productos.id_producto == pro).first()
+        R.proceso = request.form.get('proceso')
+        db.session.add(R)
+        db.session.commit()
         Productos.resetasDelete(pro)
         for id_ins in request.form:
             if request.form[id_ins]:
                 if not id_ins == 'producto' and not id_ins == 'csrf_token' and not id_ins == 'proceso':
                     Productos.resetasInsert(pro,id_ins,request.form[id_ins])
         return redirect(url_for('pro.productos_admin'))
-    return render_template('productos_reseta.html', R = reseta, P = producto, I = insumos, inputs = str(inputs))
+    return render_template('productos_reseta.html', R = reseta, P = producto, I = insumos, inputs = str(inputs),current_user=current_user)

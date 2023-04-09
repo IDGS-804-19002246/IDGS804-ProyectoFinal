@@ -16,9 +16,7 @@ usu = Blueprint('usu',__name__)
 
 
 @usu.route('/login')
-def login():
-    return render_template('login.html')
-
+def login(): return render_template('login.html')
 
 @usu.route("/login", methods=['GET','POST'])
 def login_post():
@@ -31,6 +29,10 @@ def login_post():
         flash('El usuario y/o la contraseña son incorrectos\n NO MAME COMPA, NO SIRVE')
         return render_template('login.html')
     
+    if U.rol == 'baneado':
+        flash('Este usuario esta baneado')
+        return redirect(url_for('usu.login'))
+
     login_user(U)
     
     return redirect(url_for('index'))
@@ -76,12 +78,12 @@ def signup_post():
     else:
         return render_template('singup.html')
 
-
 @usu.route("/micuenta", methods=['GET','POST'])
 @login_required
 def micuenta():
-    if request.method == 'POST':
-        return 'f'
+    if current_user.rol == 'baneado':
+        flash('Este usuario esta baneado')
+        return redirect(url_for('usu.login'))
     ventas = Ventas.ventasSelectUsuario(current_user.id)
     lista = []
     salida = []
@@ -141,6 +143,9 @@ def micuenta():
 
 @usu.route('/micuenta_editar', methods=['GET','POST'])
 def micuenta_editar():
+    if current_user.rol == 'baneado':
+        flash('Este usuario esta baneado')
+        return redirect(url_for('usu.login'))
     if request.method == 'POST':
         if request.form.get('accion') == 'update':
             id = request.form.get('id')
@@ -171,27 +176,18 @@ def micuenta_editar():
     return redirect(url_for('usu.micuenta'))
 
 
+@usu.route('/usuarios', methods=['GET','POST'])
+def usuarios():
+    if current_user.rol == 'baneado':
+        flash('Este usuario esta baneado')
+        return redirect(url_for('usu.login'))
+    U = Usuarios.usuariosSelectTodo()
+    return render_template('usuarios.html', ADMIN = U[0], EMPLE = U[1], COMUN = U[2], BANN = U[3],current_user=current_user)
 
-
-
-
-
-# {% for key, group in L|groupby('id_venta') %}
-#             <!-- <h4>{{ group|length }}</h4> -->
-#             <h6>{{ group[0].fecha }}</h6>
-#                 <div class="rounded bg-danger">
-#                     <!-- <li>Grupo {{ key }}:</li> -->
-#                     <!-- <h4>{{ loop.index }} </h4> -->
-
-#                     {% for item in group %}
-#                     <div class="px-4 py-3 text-light fw-bold">
-
-#                         <h4 class="d-inline-block px-4" style="width: 8%;">X{{ item.cantidad }}</h4>
-#                         <h4 class="d-inline-block px-4 w-50">{{ item.nombre }}</h4>
-                        
-#                         <h4 class="d-inline-block px-4 float-end">${{ item.precio }}</h4>
-#                     </div>
-#                     {% endfor %}
-                
-#                 </div>
-#             {% endfor %}
+@usu.route('/usuarios_editar', methods=['GET','POST'])
+def usuarios_editar():
+    if current_user.rol == 'baneado':
+        flash('Este usuario esta baneado')
+        return redirect(url_for('usu.login'))
+    Usuarios.usuariosRol(request.args.get('id'),request.args.get('es'))
+    return redirect(url_for('usu.usuarios'))
