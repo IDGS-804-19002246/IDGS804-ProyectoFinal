@@ -11,6 +11,7 @@ from config import DevelopmentConfig
 from rutas.usuarios import usu
 from rutas.productos import pro
 from rutas.insumos import ins
+from rutas.cocina import coc
 
 
 # from model import db
@@ -27,6 +28,7 @@ csrf = CSRFProtect()
 app.register_blueprint(usu)
 app.register_blueprint(pro)
 app.register_blueprint(ins)
+app.register_blueprint(coc)
 
 login_manager = LoginManager()
 login_manager.init_app(app)
@@ -63,12 +65,11 @@ def index():
             }
         )
 
-    return render_template('index.html', G=galletas)
+    return render_template('index.html', G=galletas,current_user=current_user)
 
 
 @app.route("/nosotros", methods=['GET'])
-def nosotros():
-    return render_template('nosotros.html')
+def nosotros(): return render_template('nosotros.html',current_user=current_user)
 
 
 
