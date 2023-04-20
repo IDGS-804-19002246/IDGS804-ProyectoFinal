@@ -18,6 +18,8 @@ class Productos(db.Model):
     proceso=db.Column(db.String(250))
     img=db.Column(db.String(250))
     descripcion=db.Column(db.String(64))
+    estado=db.Column(db.String(4))
+    pendientes=db.Column(db.Integer)
 
     def ProductosSelectTodos():
         try:
