@@ -170,7 +170,7 @@ def carrito():
 
         response = make_response(redirect(url_for('pro.carrito')))
         response.delete_cookie('carrito', domain="127.0.0.1")
-        flash('Al compre se realizo con exito.')
+        flash('La compra se realizo con exito.')
         return response
     
     if current_user.rol == 'baneado':
@@ -254,7 +254,6 @@ def productos_editar():
             up_path = os.path.join(basepath,'../static/img/productos/',nue)
             file.save(up_path)
         m = Productos.ProductosUpdate(
-            # nom,can,can_min,pre_U,pre_M,pro,i,des
             request.form.get('id_producto'),
             request.form.get('nombre'),
             request.form.get('cantidad'),
@@ -264,9 +263,7 @@ def productos_editar():
             request.form.get('proceso'),
             nue,
             request.form.get('descripcion')
-
         )
-
         return redirect(url_for('pro.productos_admin'))
     return render_template('productos_editar.html', form = create_form,current_user=current_user)
 
