@@ -3,11 +3,15 @@ html, body{
     /* font-family: sans-serif; */
     background-color: black;
 }
+.g-danger{
+    background-color: #a56f34;
+}
 .nav-item{
     padding: 0 32px;
 }
 .nav-item:hover{
-    background-color: #aa0313;
+    /* background-color: #604120; */
+    background-color:#604120;
     transition-duration: 0.5s;
 }
 
@@ -75,8 +79,8 @@ html, body{
 }
 .targeta:hover .Centrado, .targeta:active .Centrado{
     background-color: white;
-    color: #aa0313;
-    border-color: #aa0313;
+    color: #604120;
+    border-color: #604120;
 }
 .targeta h4{
     white-space: nowrap;
@@ -94,7 +98,7 @@ html, body{
 .Centrado{
     width: 60%;
     margin-left: 20%;
-    background-color: #aa0313;
+    background-color: #604120;
     color: white;
 }
 .cuadrado{
@@ -120,7 +124,7 @@ html, body{
 .bloque{
     display: inline-block;
 }
-#usuarios .justify-content-between{
+#usuarios .justify-content-between, .items{
     display: flex;
 }
 @media (max-width: 1200px) {
@@ -132,9 +136,9 @@ html, body{
     .producto .col-sm-6{
         height: 50%;
     }
-    .bloque{
+    /* .bloque{
         display: block;
-    }
+    } */
     .targeta{
         width: 49%;
     }
@@ -142,7 +146,7 @@ html, body{
         width: 80%;
         margin-left: 10%;
     }
-    #usuarios .justify-content-between{
+    #usuarios .justify-content-between, .items{
         display: block;
     }
 }
@@ -161,7 +165,7 @@ html, body{
 
 #insumos table tr th,#insumos table tr td{
     width: 8%;
-    border-bottom: 2px solid #aa0313;
+    border-bottom: 2px solid #604120;
 }
 #insumos table tr th:first-child, #insumos table tr td:first-child{
     width: 4%;
@@ -174,19 +178,9 @@ html, body{
     scrollbar-width:none;
 }
 
-#carrito tr th,#carrito tr td{
-    width: 4%;
-    border-bottom: 2px solid #aa0313;
-}
-#carrito table tbody{
-    /* overflow-y:auto; */
-    overflow-x: hidden; 
-    height: 360px;
-    /* scrollbar-color:  transparent transparent; */ 
-    scrollbar-width:none;
-}
+
 .borde{
-    border-bottom: 2px solid #aa0313;
+    border-bottom: 2px solid #604120;
 }
 .borde-r{
     border-right: 2px solid #fff;
@@ -194,12 +188,21 @@ html, body{
 
 
 .table-responsive{max-height: 360px;}
-.table thead{
+.table thead, .estatico{
 position: sticky;
 top: 0;
 z-index: 1;
 }
 .table th{padding: 4px 16px;}
   
-  
-  
+
+
+.modal{
+    transition-duration: 0.5s;
+    transition: 0.5s all ease;
+
+}
+.min{
+max-width: 200px;
+height: 200px;
+}
