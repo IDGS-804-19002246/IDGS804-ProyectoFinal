@@ -1,6 +1,8 @@
 from flask import Blueprint, redirect, render_template, url_for,request, flash,make_response
 from flask_login import LoginManager, login_user, login_required, logout_user,current_user
 from werkzeug.security import generate_password_hash, check_password_hash
+from flask_login import LoginManager, login_required, current_user
+
 from datetime import date
 import json
 
@@ -131,6 +133,7 @@ def carrito_edit():
 def carrito():
     carrito = request.cookies.get("carrito")
     lista = []
+    
     #SE VERIFICA SI HAY PROCUCTOS EN EL CARRITO Y SI HAY LE DA FORMATO PARA EMVIARLO A LA VISTA
     if not carrito: lista = ''
     else:
@@ -170,12 +173,18 @@ def carrito():
 
         response = make_response(redirect(url_for('pro.carrito')))
         response.delete_cookie('carrito', domain="127.0.0.1")
-        flash('Al compre se realizo con exito.')
+        flash('La compra se realizo con exito.')
         return response
     
     if current_user.rol == 'baneado':
         flash('Esta usuario esta baneado')
         return redirect(url_for('usu.login'))
+    
+    if not current_user.is_authenticated:
+        response = make_response(redirect(url_for('pro.productos')))
+        response.delete_cookie('carrito', domain="127.0.0.1")
+        flash('Debe iniciar sesión para comprar')
+        return response
     return render_template('carrito.html', C = lista,current_user=current_user)
 
 
@@ -192,15 +201,9 @@ def productos_admin():
     for g in ga:
         galletas.append(            
             {
-            'id_producto':g[0],
-            'nombre':g[1].capitalize(),
-            'cantidad':g[2],
-            'cantidad_min':g[3],
-            'precio_U':g[4],
-            'precio_M':g[5],
-            'proceso':g[6].capitalize(),
-            'img':g[7],
-            'descripcion':g[8].capitalize(),
+            'id_producto':g[0],'nombre':g[1].capitalize(),'cantidad':g[2],
+            'cantidad_min':g[3],'precio_U':g[4],'precio_M':g[5],
+            'proceso':g[6].capitalize(),'img':g[7],'descripcion':g[8].capitalize(),
             'estado':g[9]
             }
         )
@@ -254,7 +257,6 @@ def productos_editar():
             up_path = os.path.join(basepath,'../static/img/productos/',nue)
             file.save(up_path)
         m = Productos.ProductosUpdate(
-            # nom,can,can_min,pre_U,pre_M,pro,i,des
             request.form.get('id_producto'),
             request.form.get('nombre'),
             request.form.get('cantidad'),
@@ -264,9 +266,7 @@ def productos_editar():
             request.form.get('proceso'),
             nue,
             request.form.get('descripcion')
-
         )
-
         return redirect(url_for('pro.productos_admin'))
     return render_template('productos_editar.html', form = create_form,current_user=current_user)
 

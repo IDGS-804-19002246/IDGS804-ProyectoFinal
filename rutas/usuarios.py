@@ -1,4 +1,4 @@
-from flask import Blueprint, redirect, render_template, url_for,request, flash,current_app
+from flask import Blueprint, redirect, render_template, url_for,request, flash,current_app,make_response
 from flask_login import login_user, login_required, logout_user,current_user
 from werkzeug.security import generate_password_hash, check_password_hash
 from itertools import groupby
@@ -26,7 +26,7 @@ def login_post():
     U = Usuarios.query.filter_by(correo=correo).first()
 
     if not U or not check_password_hash(U.contrasena, contrasena) :
-        flash('El usuario y/o la contraseña son incorrectos\n NO MAME COMPA, NO SIRVE')
+        flash('El usuario y/o la contraseña son incorrectos')
         return render_template('login.html')
     
     if U.rol == 'baneado':
@@ -43,6 +43,9 @@ def login_post():
 @login_required
 def logout():
     logout_user()
+    response = make_response(redirect(url_for('usu.login')))
+    response.delete_cookie('carrito', domain="127.0.0.1")
+    return response
     return redirect(url_for('usu.login'))
 
 
