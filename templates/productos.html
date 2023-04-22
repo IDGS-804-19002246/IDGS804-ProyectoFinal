@@ -14,15 +14,22 @@
         
         <div class="targeta d-inline-block p-4 rounded" title="{{g.nombre}}">
             <a href="detalles?id={{g.id_producto}}" class="text-decoration-none">
-                <div class="cuadrado">
-                    <img class="rounded" src="../static/img/productos/{{g.img}}" alt="Imagen No Diponible">
+                <div class="" style="position: relative;padding-bottom: 100%;">
+                    <img class="rounded" src="../static/img/productos/{{g.img}}" alt="Imagen No Diponible" style="position: absolute;
+                    top: 0;
+                    bottom: 0;
+                    left: 0;
+                    right: 0;
+                    max-width: 100%;
+                    max-height: 100%;
+                    margin: auto;">
                 </div>
 
                 <h4 class="text-light">{{g.nombre}}</h4>
 
                 <button class="Centrado rounded-pill py-1">Ver más</button>
 
-                {% if current_user.is_authenticated and current_user.rol == 'admin' or 'empleado' %}
+                {% if current_user.is_authenticated and current_user.rol != 'comun' %}
                 <div class="rounded-end bg-danger esconder">
                     <h6 class="text-light">Administrar</h6>
                     <a href="productos_reseta?id={{g.id_producto}}"><button class="btn btn-light">Reseta</button></a>

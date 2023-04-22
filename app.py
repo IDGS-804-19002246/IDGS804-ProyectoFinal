@@ -4,8 +4,9 @@ from flask_wtf.csrf import CSRFProtect
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user
 from flask import render_template, request, redirect, url_for, jsonify, flash
-# from flask_wtf import CSRFProtect
 
+from flask_security import Security
+from flask_security import SQLAlchemyUserDatastore
 
 from config import DevelopmentConfig
 from rutas.usuarios import usu
@@ -24,6 +25,8 @@ app = flask.Flask(__name__)
 app.config.from_object(DevelopmentConfig)
 csrf = CSRFProtect()
 
+security = Security()
+
 
 app.register_blueprint(usu)
 app.register_blueprint(pro)
@@ -33,7 +36,7 @@ app.register_blueprint(coc)
 login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = 'usu.login'
-login_manager.login_message = u"Inicia Sesión, Porfa :3"
+login_manager.login_message = u"Por Favos, Inicie Sesión."
 @login_manager.user_loader
 def load_user(user_id): return Usuarios.query.get(int(user_id))
 
@@ -46,7 +49,6 @@ def load_user(user_id): return Usuarios.query.get(int(user_id))
 
 @app.route("/index", methods=['GET', 'POST'])
 @app.route("/", methods=['GET', 'POST'])
-@login_required
 def index():
     ga = Productos.ProductosSelectTodos()
     galletas = []
