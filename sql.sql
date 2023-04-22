@@ -19,6 +19,22 @@
 CREATE DATABASE IF NOT EXISTS `idgs804_galletas` /*!40100 DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci */ /*!80016 DEFAULT ENCRYPTION='N' */;
 USE `idgs804_galletas`;
 
+-- Volcando estructura para procedimiento idgs804_galletas.comprasSelectMes
+DELIMITER //
+CREATE PROCEDURE `comprasSelectMes`(
+	IN `fec` VARCHAR(10)
+)
+BEGIN
+	SELECT
+		p.nombre, p.correo, p.telefono,i.nombre, ip.cantidad,ip.fecha,ip.costo, i.medida
+		FROM proveedores AS p
+		INNER JOIN insumo_proveedor as ip ON p.id_proveedor = ip.id_proveedor
+		INNER JOIN insumos AS i ON ip.id_insumo = i.id_insumo
+		WHERE DATE_FORMAT(ip.fecha, '%Y-%m') = fec
+			ORDER BY ip.fecha DESC;
+END//
+DELIMITER ;
+
 -- Volcando estructura para procedimiento idgs804_galletas.consultarTodos
 DELIMITER //
 CREATE PROCEDURE `consultarTodos`()
@@ -51,6 +67,18 @@ VALUES
 ((select MAX(id_venta) FROM ventas ),dir)//
 DELIMITER ;
 
+-- Volcando estructura para tabla idgs804_galletas.historial
+CREATE TABLE IF NOT EXISTS `historial` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `usuario` varchar(50) DEFAULT NULL,
+  `tabla_modificada` varchar(50) DEFAULT NULL,
+  `accion` varchar(10) DEFAULT NULL,
+  `fecha_hora` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+-- Volcando datos para la tabla idgs804_galletas.historial: ~0 rows (aproximadamente)
+
 -- Volcando estructura para tabla idgs804_galletas.insumos
 CREATE TABLE IF NOT EXISTS `insumos` (
   `id_insumo` int NOT NULL AUTO_INCREMENT,
@@ -58,25 +86,68 @@ CREATE TABLE IF NOT EXISTS `insumos` (
   `cantidad` int DEFAULT NULL,
   `cantidad_min` int DEFAULT NULL,
   `medida` varchar(8) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
-  `caducidad` date DEFAULT NULL,
+  `caducidad` json DEFAULT NULL,
   PRIMARY KEY (`id_insumo`)
-) ENGINE=InnoDB AUTO_INCREMENT=32 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=33 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- Volcando datos para la tabla idgs804_galletas.insumos: ~13 rows (aproximadamente)
 INSERT INTO `insumos` (`id_insumo`, `nombre`, `cantidad`, `cantidad_min`, `medida`, `caducidad`) VALUES
-	(1, 'arina', 9500, 5, 'ml', '2023-03-29'),
-	(2, 'leche', 9000, 5, 'ml', '2023-03-29'),
-	(3, 'chocolate (polvo)', 1600, 500, 'g', '2023-03-29'),
-	(4, 'nueces picadas', 1500, 500, 'g', '1111-11-11'),
-	(5, 'levadura', 800, 500, 'g', '2023-03-29'),
-	(7, 'huevo', 120, 100, 'pza', '2023-03-29'),
-	(8, 'canela (polvo)', 800, 500, 'g', '2023-03-29'),
-	(9, 'coco (rallado)', 500, 500, 'g', '2023-03-29'),
-	(10, 'miel', 500, 500, 'ml', '2023-03-29'),
-	(11, 'mantequilla', 2000, 1000, 'g', '2023-03-29'),
-	(12, 'ralladura de naranaja', 1000, 500, 'g', '2023-03-29'),
-	(13, 'ralladura de limon', 1000, 500, 'g', '2023-03-29'),
-	(14, 'Fresas', 1501, 1000, 'g', '2023-03-29');
+	(1, 'arina', 9050, 5, 'ml', '[]'),
+	(2, 'leche', 8101, 5, 'ml', '[{"can": 4100, "fecha": "2023-03-29"}, {"can": 4001, "fecha": "2023-03-29"}]'),
+	(3, 'chocolate (polvo)', 1600, 500, 'g', '[{"can": 1600, "fecha": "2023-03-29"}]'),
+	(4, 'nueces picadas', 1500, 500, 'g', '[{"can": 69, "fecha": "2020-02-02"}]'),
+	(5, 'levadura', 800, 500, 'g', '[{"can": 800, "fecha": "2023-03-29"}]'),
+	(7, 'huevo', 120, 100, 'pza', '[{"can": 120, "fecha": "2023-03-29"}, {"can": 120, "fecha": "2023-03-30"}, {"can": 120, "fecha": "2023-04-10"}]'),
+	(8, 'canela (polvo)', 800, 500, 'g', '[{"can": 800, "fecha": "2023-03-29"}]'),
+	(9, 'coco (rallado)', 500, 500, 'g', '[{"can": 500, "fecha": "2023-03-29"}]'),
+	(10, 'miel', 500, 500, 'ml', '[{"can": 500, "fecha": "2023-03-29"}]'),
+	(11, 'mantequilla', 2000, 1000, 'g', '[{"can": 2000, "fecha": "2023-03-29"}]'),
+	(12, 'ralladura de naranaja', 1000, 500, 'g', '[{"can": 1000, "fecha": "2023-03-29"}]'),
+	(13, 'ralladura de limon', 1000, 500, 'g', '[{"can": 1000, "fecha": "2023-03-29"}]'),
+	(14, 'Fresas', 1501, 1000, 'g', '[{"can": 1501, "fecha": "2023-03-29"}]'),
+	(32, 'Sal fina', 2000, 490, 'g', '[]');
+
+-- Volcando estructura para procedimiento idgs804_galletas.InsumosAdd
+DELIMITER //
+CREATE PROCEDURE `InsumosAdd`(
+	IN `id` INT,
+	IN `can` INT,
+	IN `fec` VARCHAR(10),
+	IN `prov` INT
+)
+BEGIN
+DECLARE f INT;
+DECLARE item JSON;
+
+SET item = JSON_OBJECT('can', can, 'fecha', fec);
+UPDATE insumos  SET caducidad = JSON_ARRAY_APPEND(caducidad, '$', item )WHERE id_insumo = id;
+
+SET f = (SELECT SUM(jt.can) as total_can
+	FROM insumos
+	CROSS JOIN JSON_TABLE(caducidad, '$[*]' COLUMNS (
+	  can INT PATH '$.can'
+	)) AS jt
+	WHERE id_insumo = id);
+
+UPDATE insumos  SET cantidad = f WHERE id_insumo = id;
+
+
+END//
+DELIMITER ;
+
+-- Volcando estructura para procedimiento idgs804_galletas.InsumosCocinando
+DELIMITER //
+CREATE PROCEDURE `InsumosCocinando`(
+	IN `id_pro` INT
+)
+BEGIN
+
+SELECT i.id_insumo, r.cantidad, i.caducidad, i.cantidad FROM insumos AS i
+	INNER JOIN resetas AS r ON i.id_insumo = r.id_insumo WHERE r.id_producto = id_pro;
+
+
+END//
+DELIMITER ;
 
 -- Volcando estructura para procedimiento idgs804_galletas.InsumosCocinar
 DELIMITER //
@@ -86,15 +157,43 @@ CREATE PROCEDURE `InsumosCocinar`(
 )
 BEGIN
 
+/*
+	IF (
+		SELECT JSON_LENGTH(i.caducidad) FROM insumos AS i
+		INNER JOIN resetas AS r ON i.id_insumo = r.id_insumo WHERE r.id_producto = id_pro) <= 0 THEN
+		SELECT 'No perecedero';
+		/*UPDATE insumos AS i
+			INNER JOIN resetas AS r ON i.id_insumo = r.id_insumo
+			SET i.cantidad = i.cantidad - r.cantidad*can
+			WHERE r.id_producto = id_pro;	
+	ELSE
+	END IF;*/
+	
+	/*RESTAR LOS INSUMOS
 	UPDATE insumos AS i
 		INNER JOIN resetas AS r ON i.id_insumo = r.id_insumo
-		
 		SET i.cantidad = i.cantidad - r.cantidad*can
-		WHERE r.id_producto = id_pro;
-		
-	UPDATE productos
-		SET cantidad = cantidad+can
-		WHERE id_producto = id_pro;
+		WHERE r.id_producto = id_pro;*/
+	
+	/*AÑADIR PRODUCTOS
+	UPDATE productos SET cantidad = cantidad+can WHERE id_producto = id_pro;*/
+	
+	
+	
+	UPDATE insumos AS i
+		SET i.caducidad = 
+		    CASE
+		        WHEN JSON_LENGTH(i.caducidad) > 0 THEN
+		            JSON_REMOVE(
+		                JSON_SET(i.caducidad, '$[0].can', JSON_EXTRACT(i.caducidad, '$[0].can') - can),
+		                '$[1:]'
+		            )
+		        ELSE
+		            caducidad
+		    END
+		WHERE id_insumo = 2;
+	
+	
 	
 END//
 DELIMITER ;
@@ -107,13 +206,13 @@ CREATE PROCEDURE `InsumosCocinarValidar`(
 )
 BEGIN
 
-SELECT
-	i.nombre,
-	if(i.cantidad > (r.cantidad * can),'ok','no')AS 'SePuede?',
-	(i.cantidad - (r.cantidad * can))*-1 AS 'faltan',
-	i.medida
-FROM resetas AS r INNER JOIN insumos AS i ON r.id_insumo = i.id_insumo
-WHERE id_producto = id_pro;
+	SELECT
+		i.nombre,
+		if(i.cantidad > (r.cantidad * can),'ok','no')AS 'SePuede?',
+		(i.cantidad - (r.cantidad * can))*-1 AS 'faltan',
+		i.medida
+	FROM resetas AS r INNER JOIN insumos AS i ON r.id_insumo = i.id_insumo
+	WHERE id_producto = id_pro;
 
 end//
 DELIMITER ;
@@ -138,11 +237,11 @@ CREATE PROCEDURE `InsumosInsert`(
 	IN `can` INT,
 	IN `can_min` INT,
 	IN `med` VARCHAR(8),
-	IN `cad` DATE
+	IN `cad` JSON
 )
 INSERT INTO
 insumos(nombre,cantidad,cantidad_min, medida,caducidad)
-VALUES (nom, can, can_min,med,cad)//
+VALUES (nom, can, can_min,med, cad )//
 DELIMITER ;
 
 -- Volcando estructura para procedimiento idgs804_galletas.InsumosSelectTodos
@@ -158,17 +257,35 @@ CREATE PROCEDURE `InsumosUpdate`(
 	IN `nom` VARCHAR(32),
 	IN `can` INT,
 	IN `can_min` INT,
-	IN `med` VARCHAR(8),
-	IN `cad` DATE
+	IN `med` VARCHAR(8)
 )
 UPDATE insumos SET
 nombre = nom,
 cantidad = can,
 cantidad_min = can_min,
-medida = med,
-caducidad = cad
+medida = med
 WHERE id_insumo = id//
 DELIMITER ;
+
+-- Volcando estructura para tabla idgs804_galletas.insumo_proveedor
+CREATE TABLE IF NOT EXISTS `insumo_proveedor` (
+  `id_proveedor` int DEFAULT NULL,
+  `id_insumo` int DEFAULT NULL,
+  `cantidad` int DEFAULT NULL,
+  `fecha` date DEFAULT NULL,
+  `costo` int DEFAULT NULL,
+  KEY `FK_insumo_proveedor_proveedores` (`id_proveedor`),
+  KEY `FK_insumo_proveedor_insumos` (`id_insumo`),
+  CONSTRAINT `FK_insumo_proveedor_insumos` FOREIGN KEY (`id_insumo`) REFERENCES `insumos` (`id_insumo`),
+  CONSTRAINT `FK_insumo_proveedor_proveedores` FOREIGN KEY (`id_proveedor`) REFERENCES `proveedores` (`id_proveedor`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+-- Volcando datos para la tabla idgs804_galletas.insumo_proveedor: ~4 rows (aproximadamente)
+INSERT INTO `insumo_proveedor` (`id_proveedor`, `id_insumo`, `cantidad`, `fecha`, `costo`) VALUES
+	(1, 2, 7000, '2023-04-14', 2500),
+	(2, 1, 10000, '2023-04-14', 3000),
+	(2, 1, 10000, '2023-04-15', 3000),
+	(2, 1, 10000, '2023-04-16', 600);
 
 -- Volcando estructura para tabla idgs804_galletas.productos
 CREATE TABLE IF NOT EXISTS `productos` (
@@ -188,11 +305,11 @@ CREATE TABLE IF NOT EXISTS `productos` (
 
 -- Volcando datos para la tabla idgs804_galletas.productos: ~5 rows (aproximadamente)
 INSERT INTO `productos` (`id_producto`, `nombre`, `cantidad`, `cantidad_min`, `precio_U`, `precio_M`, `proceso`, `img`, `descripcion`, `estado`, `pendientes`) VALUES
-	(1, 'galletas de nuez', 70, 4, 14, 10, 'aquí se describe el proceso de como elaborar las galletas de nuez', 'nuez.png', 'Contenido:50 gramos, 6 piezas', 'ok', 0),
-	(2, 'galletas de fresa', 98, 10, 14, 10, 'aquí se describe el proceso de como elaborar las galletas de fresa', '2_galletas de fresa.png', 'Contenido:50 gramos, 6 piezas', 'ok', 0),
-	(3, 'galletas clasicas', 86, 10, 14, 10, 'aquí va el proceso que describe como se preparan las galletas clasicas', '3_galletas clasicas.webp', 'Contenido:50 gramos, 6 piezas', 'ok', 0),
+	(1, 'galletas de nuez', 69, 4, 14, 10, 'aquí se describe el proceso de como elaborar las galletas de nuez', 'nuez.png', 'Contenido:50 gramos, 6 piezas', 'ok', 4),
+	(2, 'galletas de fresa', 119, 10, 14, 10, 'aquí se describe el proceso de como elaborar las galletas de fresa', '2_galletas de fresa.png', 'Contenido:50 gramos, 6 piezas', 'ok', 0),
+	(3, 'galletas clasicas', 81, 10, 14, 10, 'aquí va el proceso que describe como se preparan las galletas clasicas', '3_galletas clasicas.webp', 'Contenido:50 gramos, 6 piezas', 'ok', 0),
 	(4, 'galletas mini (coco)', 64, 10, 10, 5, 'aquí se describe el proceso de como elaborar las galletas de coco', '4_wey no2.jpg', 'una breva desprincion2', 'no', 0),
-	(5, 'Galletas de naranja', 6, 3, 10, 8, 'aquí se describe el proceso de como elaborar las galletas de naranja', '5_Galletas de naranja.png', 'Contenido 6 piezas de 20 gramos', 'ok', 0);
+	(5, 'Galletas de naranja', 4, 3, 10, 8, 'aquí se describe el proceso de como elaborar las galletas de naranja', '5_Galletas de naranja.png', 'Contenido 6 piezas de 20 gramos', 'ok', 0);
 
 -- Volcando estructura para procedimiento idgs804_galletas.ProductosDelete
 DELIMITER //
@@ -287,6 +404,46 @@ BEGIN
 END//
 DELIMITER ;
 
+-- Volcando estructura para tabla idgs804_galletas.proveedores
+CREATE TABLE IF NOT EXISTS `proveedores` (
+  `id_proveedor` int NOT NULL AUTO_INCREMENT,
+  `nombre` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+  `correo` varchar(32) DEFAULT NULL,
+  `telefono` varchar(10) DEFAULT NULL,
+  `direccion` json DEFAULT NULL,
+  PRIMARY KEY (`id_proveedor`)
+) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+-- Volcando datos para la tabla idgs804_galletas.proveedores: ~7 rows (aproximadamente)
+INSERT INTO `proveedores` (`id_proveedor`, `nombre`, `correo`, `telefono`, `direccion`) VALUES
+	(1, 'Las Almas (lacteos)', 'almas@alm.com', '4770001234', '["Calle del Canela", 20, "El Refugio", "León"]'),
+	(2, 'Molino La Esperanza ', 'laesperanza@hotmail.com', '4770001234', '["Calle del Canela", 20, "El Refugio", "León"]'),
+	(3, 'La Linea. Semillas y Frutos', 'contacto@lalinea.com.mx', '4770001234', '["Blvd. José María Morelos", 2350, "Valle de la Cumbre", "León"]'),
+	(4, 'Levaduras San Miguel', 'contacto@levadurassm.com', '4770001234', '["Boulevard Aeropuerto", 123, "Industrial Delta", "León"]'),
+	(5, 'Rancho. Los Rojos', 'rancho_losrojos@hotmal.com', '4770001234', '["Boulevard Aeropuerto", 123, "Industrial Delta", "León"]'),
+	(6, 'Chocolateria La Sierra', 'info@lassierras.com', '4770001234', '["Calle 5 de Mayo", 15, "Centro", "León"]'),
+	(7, 'Chocolateria La Sierra', 'info@lassierras.com', '4770001234', '["Calle 5 de Mayo", 15, "Centro", "León"]'),
+	(8, 'Chocolateria La Sierra', 'info@lassierras.com', '4770001234', '["Calle 5 de Mayo", 15, "Centro", "León"]');
+
+-- Volcando estructura para procedimiento idgs804_galletas.ProveedoresSelectUno
+DELIMITER //
+CREATE PROCEDURE `ProveedoresSelectUno`(
+	IN `id_p` INT
+)
+BEGIN
+	SELECT
+			p.nombre,
+			i.nombre,ip.cantidad,
+			ip.costo,
+			ip.fecha
+		FROM proveedores AS p
+		INNER JOIN insumo_proveedor AS ip on p.id_proveedor = ip.id_proveedor
+		INNER JOIN insumos AS i on ip.id_insumo = i.id_insumo
+		WHERE p.id_proveedor = id_p
+		ORDER BY ip.fecha DESC;
+END//
+DELIMITER ;
+
 -- Volcando estructura para tabla idgs804_galletas.resetas
 CREATE TABLE IF NOT EXISTS `resetas` (
   `id_producto` int DEFAULT NULL,
@@ -298,18 +455,19 @@ CREATE TABLE IF NOT EXISTS `resetas` (
   CONSTRAINT `FK_resetas_productos` FOREIGN KEY (`id_producto`) REFERENCES `productos` (`id_producto`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
--- Volcando datos para la tabla idgs804_galletas.resetas: ~7 rows (aproximadamente)
+-- Volcando datos para la tabla idgs804_galletas.resetas: ~9 rows (aproximadamente)
 INSERT INTO `resetas` (`id_producto`, `id_insumo`, `cantidad`) VALUES
 	(1, 1, 100),
 	(1, 2, 100),
-	(2, 2, 300),
 	(4, 1, 255),
 	(4, 3, 100),
 	(5, 1, 500),
 	(5, 2, 1000),
 	(5, 8, 200),
 	(5, 11, 150),
-	(5, 12, 50);
+	(5, 12, 50),
+	(2, 1, 100),
+	(2, 2, 300);
 
 -- Volcando estructura para procedimiento idgs804_galletas.resetasDelete
 DELIMITER //
@@ -353,9 +511,9 @@ CREATE TABLE IF NOT EXISTS `usuarios` (
 
 -- Volcando datos para la tabla idgs804_galletas.usuarios: ~3 rows (aproximadamente)
 INSERT INTO `usuarios` (`id`, `nombre`, `apellidoP`, `apellidoM`, `correo`, `contrasena`, `rol`) VALUES
-	(1, 'juanito', 'juarez', 'herrera', 'admin@gmail.com', 'sha256$lqivPCz7Xsd6lWPg$284c90365494dfe246f1e1d6d9a0279bc0dd7cfead573bd95c88065d469f88d1', 'admin'),
-	(2, 'juan', 'juarez', 'juarez', 'admin2@gmail.com', 'sha256$AVo0KEJEIQKlvDLV$1680cda786b3d3c9b008e530c0b5a4c9ed51edcd5d5498b2aa685ac195c8360c', 'comun'),
-	(3, 'juan', 'ape P', 'ape M', 'nombre@gmail.com', 'sha256$GtI2znCgYyx8DnwR$94c8305576842018d9c0eaf5c64482887754e5039ad0cabea639cffc1a53167a', 'admin');
+	(1, 'Juan', 'juarez', 'herrera', 'admin@gmail.com', 'sha256$lqivPCz7Xsd6lWPg$284c90365494dfe246f1e1d6d9a0279bc0dd7cfead573bd95c88065d469f88d1', 'admin'),
+	(2, 'juan', 'juarez', 'juarez', 'empleado@gmail.com', 'sha256$GtI2znCgYyx8DnwR$94c8305576842018d9c0eaf5c64482887754e5039ad0cabea639cffc1a53167a', 'empleado'),
+	(3, 'Juan Jose', 'Matinez', 'Lopez', 'cliente@gmail.com', 'sha256$GtI2znCgYyx8DnwR$94c8305576842018d9c0eaf5c64482887754e5039ad0cabea639cffc1a53167a', 'comun');
 
 -- Volcando estructura para procedimiento idgs804_galletas.usuariosDelete
 DELIMITER //
@@ -447,9 +605,9 @@ CREATE TABLE IF NOT EXISTS `ventas` (
   PRIMARY KEY (`id_venta`),
   KEY `FK_ventas_usuarios` (`id_usuario`) USING BTREE,
   CONSTRAINT `FK_ventas_usuarios` FOREIGN KEY (`id_usuario`) REFERENCES `usuarios` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=23 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=25 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
--- Volcando datos para la tabla idgs804_galletas.ventas: ~8 rows (aproximadamente)
+-- Volcando datos para la tabla idgs804_galletas.ventas: ~9 rows (aproximadamente)
 INSERT INTO `ventas` (`id_venta`, `id_usuario`, `fecha`, `entrega`) VALUES
 	(1, 1, '2023-03-27', 1),
 	(14, 1, '2023-04-04', 0),
@@ -458,7 +616,9 @@ INSERT INTO `ventas` (`id_venta`, `id_usuario`, `fecha`, `entrega`) VALUES
 	(17, 1, '2023-04-04', 0),
 	(18, 1, '2023-04-04', 0),
 	(19, 1, '2023-04-04', 0),
-	(22, 1, '2023-04-04', 0);
+	(22, 1, '2023-04-04', 0),
+	(23, 1, '2023-04-11', 0),
+	(24, 1, '2023-04-18', 0);
 
 -- Volcando estructura para procedimiento idgs804_galletas.ventasInsert
 DELIMITER //
@@ -497,17 +657,22 @@ DELIMITER //
 CREATE PROCEDURE `ventasSelectPendientes`()
 BEGIN
 
-SELECT
-	v.id_venta, p.nombre, p.descripcion, vp.cantidad,vp.precio,
-	concat(v.fecha,'') AS fecha,
-	e.direccion,v.entrega, CONCAT(s.nombre, ' ',s.apellidoP,' (',s.correo,')') AS cliente
-FROM ventas AS v
-INNER JOIN venta_producto AS vp ON v.id_venta = vp.id_venta
-INNER JOIN productos AS p ON vp.id_producto = p.id_producto
-left JOIN envios AS e ON e.id_venta = v.id_venta
-inner JOIN usuarios AS s ON v.id_usuario = s.id
-WHERE v.entrega = 0
-ORDER BY v.id_venta DESC;
+	SELECT
+		v.id_venta, p.nombre,
+		p.descripcion, vp.cantidad,vp.precio,
+		concat(v.fecha,'') AS fecha,
+		e.direccion,v.entrega, CONCAT(s.nombre, ' ',s.apellidoP,' (',s.correo,')') AS cliente
+		
+		
+	FROM ventas AS v
+	INNER JOIN venta_producto AS vp ON v.id_venta = vp.id_venta
+	INNER JOIN productos AS p ON vp.id_producto = p.id_producto
+	left JOIN envios AS e ON e.id_venta = v.id_venta
+	inner JOIN usuarios AS s ON v.id_usuario = s.id
+
+
+	WHERE v.entrega = 0
+	ORDER BY v.id_venta DESC;
 
 END//
 DELIMITER ;
@@ -547,6 +712,29 @@ WHERE v.id_usuario = id_us
 ORDER BY v.id_venta desc//
 DELIMITER ;
 
+-- Volcando estructura para procedimiento idgs804_galletas.ventasTotal
+DELIMITER //
+CREATE PROCEDURE `ventasTotal`(
+	IN `fec` VARCHAR(10)
+)
+BEGIN
+
+	SELECT
+		if(SUM(vp.precio*vp.cantidad),SUM(vp.precio*vp.cantidad),0) AS Ganancia
+		from venta_producto AS vp
+		INNER JOIN ventas AS v ON vp.id_venta = v.id_venta
+		WHERE DATE_FORMAT(v.fecha, '%Y-%m') = fec;
+		/*WHERE MONTH(fecha) = MONTH(fec) AND YEAR(fecha) = YEAR(fec);*/
+
+	SELECT 
+		if(SUM(ip.costo),SUM(ip.costo),0) AS Gasto
+		FROM insumo_proveedor as ip
+		WHERE DATE_FORMAT(ip.fecha, '%Y-%m') = fec;
+/*		WHERE MONTH(fecha) = MONTH(fec) AND YEAR(fecha) = YEAR(fec);*/
+
+END//
+DELIMITER ;
+
 -- Volcando estructura para tabla idgs804_galletas.venta_producto
 CREATE TABLE IF NOT EXISTS `venta_producto` (
   `id_venta` int DEFAULT NULL,
@@ -559,7 +747,7 @@ CREATE TABLE IF NOT EXISTS `venta_producto` (
   CONSTRAINT `FK_venta_producto_ventas` FOREIGN KEY (`id_venta`) REFERENCES `ventas` (`id_venta`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
--- Volcando datos para la tabla idgs804_galletas.venta_producto: ~14 rows (aproximadamente)
+-- Volcando datos para la tabla idgs804_galletas.venta_producto: ~16 rows (aproximadamente)
 INSERT INTO `venta_producto` (`id_venta`, `id_producto`, `cantidad`, `precio`) VALUES
 	(1, 1, 2, 8),
 	(1, 2, 1, 8),
@@ -574,7 +762,10 @@ INSERT INTO `venta_producto` (`id_venta`, `id_producto`, `cantidad`, `precio`) V
 	(17, 3, 5, 70),
 	(18, 1, 5, 70),
 	(19, 3, 2, 28),
-	(22, 1, 5, 70);
+	(22, 1, 5, 70),
+	(23, 5, 2, 20),
+	(24, 3, 5, 70),
+	(24, 1, 1, 14);
 
 -- Volcando estructura para procedimiento idgs804_galletas.venta_productoInsert
 DELIMITER //

@@ -27,7 +27,7 @@ class productos(Form):
     id_producto = IntegerField('id_producto')
     nombre = StringField('Nombre',[validators.DataRequired(message='Dato requerido')])
 
-    cantidad = IntegerField('Cantidad (Existencias)',[validators.DataRequired(message='Dato requerido'),validators.number_range(min=1,message='El campo no puede ser 0')])
+    cantidad = IntegerField('Cantidad (Existencias)',[validators.Optional(),validators.number_range(min=0,message='El campo no puede ser menor a 0')])
     cantidad_min = IntegerField('Cantidad Minima',[validators.DataRequired(message='Dato requerido'),validators.number_range(min=1,message='El campo no puede ser 0')])
     precio_U = IntegerField('Precio por Unidad',[validators.DataRequired(message='Dato requerido'),validators.number_range(min=1,message='El campo no puede ser 0')])
     precio_M = IntegerField('Precio Mayoreo',[validators.DataRequired(message='Dato requerido'),validators.number_range(min=1,message='El campo no puede ser 0')])
@@ -38,9 +38,8 @@ class productos(Form):
 
 class insumos(Form):
     nombre = StringField('Mombre',[validators.length(min=4,max=32,message='El nombre debe tener entre 8 y 32 caracteres')])
-    cantidad = IntegerField('Cantidad',[validators.number_range(min=1,message='El valor no puede ser menor a 1')])
+    cantidad = IntegerField('Cantidad',[validators.Optional(),validators.number_range(min=1,message='El valor no puede ser menor a 0')])
     cantidad_min = IntegerField('Cantidad Mínima',[validators.number_range(min=1,message='El valor no puede ser menor a 1')])
-    caducidad = DateField('Fechas de Caducidad',[validators.optional()])
 
 
 

@@ -5,11 +5,11 @@
 
 <div class="p-4 fondo" style="--f:url(../static/img/fondo1.jpg)">
     <h2 class="text-light text-center" style="font-family: 'Cubano', sans-serif;">Administración de Productos</h2>
-    {% with messages = get_flashed_messages() %}{% if messages %} <div class="text-light bg-danger m-2 p-2 rounded">{{ messages[0] }}</div>{% endif %}{% endwith %}
+    {% with messages = get_flashed_messages() %}{% if messages %} <div class="text-light g-danger m-2 p-2 rounded">{{ messages[0] }}</div>{% endif %}{% endwith %}
 
     <div class="row">
 
-        <div class="col-sm-3 p-4 mt-2 bg-danger h-25" style="border-radius: 32px 8px 32px 32px;">
+        <div class="col-sm-3 p-4 mt-2 g-danger h-25" style="border-radius: 32px 8px 32px 32px;">
             <a href="productos_añadir"><button type="button" class="btn btn-light w-20">Añadir Producto</button></a>
             
             {% if M|length != 0 and F|length == 0 %}
@@ -36,7 +36,7 @@
             <div class="table-responsive">
 
                 <table class="table text-center fw-bold">
-                    <thead class="bg-danger text-light">
+                    <thead class="g-danger text-light">
                         <tr>
                             <th>Id</th>
                             <th>Nombre</th>
@@ -58,7 +58,7 @@
                         </tr>
                         <tr class="borde bg-opacity targeta" style="background-color: #ff000040;">
                             <td colspan="3">Descripción: {{g.descripcion}}</td>
-                            <td colspan="1" class="rounded-end bg-danger esconder2">
+                            <td colspan="1" class="rounded-end esconder2" style="background-color: #a56f34;">
                                 <span class="text-light w-25">Administrar {{g.nombre}}</span>
                                 <div class="w-50">
                                     <a href="productos_editar?id={{g.id_producto}}"><button class="btn btn-light">Producto</button></a>
