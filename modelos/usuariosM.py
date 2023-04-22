@@ -6,6 +6,7 @@ import sys
 sys.path.append("..")
 from config import db
 
+
 class Usuarios(UserMixin,db.Model):
     __tablaname__='usuarios'
 
@@ -38,6 +39,38 @@ class Usuarios(UserMixin,db.Model):
         except Exception as ex:
             print(ex)
 
+    def usuariosSelectTodo():
+        usuarios = []
+        try:
+            connection = get_connection()
+            with connection.cursor() as cursor:
+                cursor.execute('call usuariosSelectTodo()')
+                
+                usuarios.append(cursor.fetchall())
+
+                cursor.nextset()
+                usuarios.append(cursor.fetchall())
+
+                cursor.nextset()
+                usuarios.append(cursor.fetchall())
+
+                cursor.nextset()
+                usuarios.append(cursor.fetchall())
+                
+                return usuarios
+        except Exception as ex:
+            print(ex)
+
+    def usuariosRol(id,rol):
+        try:
+            connection = get_connection()
+            with connection.cursor() as cursor:
+                cursor.execute('call usuariosRol(%s,%s)',(id,rol))
+                connection.commit()
+                connection.close()
+        except Exception as ex:
+            print(ex)
+    
     # def consultarTodos():
     #     try:
     #         connection = get_connection()
