@@ -50,7 +50,7 @@
                             <span class="px-4">{{ll.descripcion}}</span>
                         </div>
                         {% endfor %}
-                        {%if l.direccion %}<span class="px-4 fw-bold">Direccion de destino:
+                        {%if l.direccion %}<span class="px-4 fw-bold">Dirección de destino:
                             {{l.direccion}}</span>{%endif%}
                     </div>
                     {% endfor %}
@@ -61,7 +61,7 @@
                     {% for c in C %}
                     <div class="justify-content-between items">
                         <h5 class="text-light w-50"><b>{{c.nombre}} ({{c.correo}})</b></h5>
-                        <h5 class="text-light"><b>Telefono:{{ c.telefono }}</b></h5>
+                        <h5 class="text-light"><b>Teléfono:{{ c.telefono }}</b></h5>
                         <h5 class="text-light"><b>Costo: ${{c.costo}}</b></h5>
                     </div>
                     <div class="justify-content-between items rounded bg-light mb-2">

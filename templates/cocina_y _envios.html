@@ -17,7 +17,7 @@
                         {%if P|length == 0 %}
                         <div class="estatico g-danger"><h4 class="text-light">No hay productos por preparar</h4></div>
                         {%else%}
-                        <div class="estatico g-danger"><h4 class="text-light">Produntos por cocinar</h4></div>
+                        <div class="estatico g-danger"><h4 class="text-light">Productos por cocinar</h4></div>
                             {%for p in P%}
                                 <div class="justify-content-between d-flex">
                                     <div class="p-2 bd-highlight text-capitalize"><b><a href="detalles?id={{p[0]}}" class="text-light m-0">({{p[2]}}) - {{p[1]}}</a></b></div>
@@ -65,7 +65,7 @@
                                 
                             </div>
                             {% endfor %}
-                            {%if l.direccion %}<span class="px-4 fw-bold">Direccion de destino: {{l.direccion}}</span>{%endif%}
+                            {%if l.direccion %}<span class="px-4 fw-bold">Dirección de destino: {{l.direccion}}</span>{%endif%}
                             
                         
                         </div>

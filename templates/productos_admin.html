@@ -42,7 +42,7 @@
                             <th>Nombre</th>
                             <th>Cantidad</th>
                             <th>Cantidad Minima</th>
-                            <th>Precio Uniadad / Mayoreo</th>
+                            <th>Precio Unidad / Mayoreo</th>
                         </tr>
                     </thead>
 
@@ -62,7 +62,7 @@
                                 <span class="text-light w-25">Administrar {{g.nombre}}</span>
                                 <div class="w-50">
                                     <a href="productos_editar?id={{g.id_producto}}"><button class="btn btn-light">Producto</button></a>
-                                    <a href="productos_reseta?id={{g.id_producto}}"><button class="btn btn-light" onclick="resetaUpdate('{{g.id_producto}}')">Reseta</button></a>
+                                    <a href="productos_reseta?id={{g.id_producto}}"><button class="btn btn-light" onclick="resetaUpdate('{{g.id_producto}}')">Receta</button></a>
 
                                     <form action="productos_admin" id="cocinar_{{g.id_producto}}" class="d-inline-block" method="POST">
                                         <input type="hidden" name="csrf_token" value="{{csrf_token()}}" />

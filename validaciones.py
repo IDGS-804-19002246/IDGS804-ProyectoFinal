@@ -33,11 +33,11 @@ class productos(Form):
     precio_M = IntegerField('Precio Mayoreo',[validators.DataRequired(message='Dato requerido'),validators.number_range(min=1,message='El campo no puede ser 0')])
     img = FileField('Imagen')
     proceso = TextAreaField('Proceso',[validators.DataRequired(message='Dato requerido')])
-    descripcion = TextAreaField('Descripcion',[validators.DataRequired(message='Dato requerido')])
+    descripcion = TextAreaField('Descripción',[validators.DataRequired(message='Dato requerido')])
 
 
 class insumos(Form):
-    nombre = StringField('Mombre',[validators.length(min=4,max=32,message='El nombre debe tener entre 8 y 32 caracteres')])
+    nombre = StringField('Nombre',[validators.length(min=4,max=32,message='El nombre debe tener entre 8 y 32 caracteres')])
     cantidad = IntegerField('Cantidad',[validators.Optional(),validators.number_range(min=1,message='El valor no puede ser menor a 0')])
     cantidad_min = IntegerField('Cantidad Mínima',[validators.number_range(min=1,message='El valor no puede ser menor a 1')])
 
@@ -49,7 +49,7 @@ class UserForm(Form):
         (min=1,max=100,message='valor no valido')])
     nombre = StringField('Nombre',[NoNumeros,NoVacio])
 
-    apaterno = StringField('apaterno',[NoVacio,NoNumeros])
+    apaterno = StringField('Apellido Paterno',[NoVacio,NoNumeros])
     
     email = EmailField('correo',[validators.Email(message='Dame un correo valido'),NoVacio,NoEspacios])
     
@@ -57,7 +57,7 @@ class Profes(Form):
     id = IntegerField('id')
     nombre = StringField('Nombre',[NoNumeros,NoVacio])
     
-    apaterno = StringField('apaterno',[NoVacio,NoNumeros])
+    apaterno = StringField('Apellido Paterno',[NoVacio,NoNumeros])
     
     email = EmailField('email',[validators.Email(message='Dame un correo valido'),NoVacio,NoEspacios])
     

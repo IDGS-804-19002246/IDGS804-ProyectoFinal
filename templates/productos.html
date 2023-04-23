@@ -15,7 +15,7 @@
         <div class="targeta d-inline-block p-4 rounded" title="{{g.nombre}}">
             <a href="detalles?id={{g.id_producto}}" class="text-decoration-none">
                 <div class="" style="position: relative;padding-bottom: 100%;">
-                    <img class="rounded" src="../static/img/productos/{{g.img}}" alt="Imagen No Diponible" style="position: absolute;
+                    <img class="rounded" src="../static/img/productos/{{g.img}}" alt="Imagen No Disponible" style="position: absolute;
                     top: 0;
                     bottom: 0;
                     left: 0;
@@ -32,7 +32,7 @@
                 {% if current_user.is_authenticated and current_user.rol != 'comun' %}
                 <div class="rounded-end bg-danger esconder">
                     <h6 class="text-light">Administrar</h6>
-                    <a href="productos_reseta?id={{g.id_producto}}"><button class="btn btn-light">Reseta</button></a>
+                    <a href="productos_reseta?id={{g.id_producto}}"><button class="btn btn-light">Receta</button></a>
                     <a href="productos_editar?id={{g.id_producto}}"><button class="btn btn-light">Producto</button></a>
                 </div>
                 {%endif%}
